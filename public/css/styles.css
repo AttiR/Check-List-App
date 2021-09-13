@@ -1,13 +1,31 @@
 html {
   background-color: #FFFFFF;
+  text-align: center;
+  font-family: 'Kaisei HarunoUmi', serif;
 
   font-family: 'helvetica neue';
+  background: url(https://www.ppt-backgrounds.net/thumbs/simple-for-simple-blue-for-img-wide-photo-image.jpeg)
+    no-repeat center;
+  background-size: cover;
+
 }
 
-h1 {
+  
+
+#main-heading{
+
+  color: #18181a;
+  margin: 30px 0;
+  padding: 10px;
+ 
+}
+
+h1{
   color: #fff;
   padding: 10px;
+  
 }
+
 
 .box {
   max-width: 400px;
@@ -16,6 +34,7 @@ h1 {
   background: linear-gradient(to right, rgba(255, 173, 0, 0.4), rgba(255, 173, 0, 1));;
   border-radius: 5px;
   box-shadow: 5px 5px 15px -5px rgba(0, 0, 0, 0.3);
+  margin: 30px, auto;
 }
 
 #heading {
@@ -93,4 +112,7 @@ footer {
   color: white;
   color: rgba(0, 0, 0, 0.5);
   text-align: center;
+  padding: 20px;
+  
 }
+

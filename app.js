@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 
 const mongoose = require("mongoose");
 const _ = require("lodash");
+const dotenv = require('dotenv').config();
 
 
 const app = express();
@@ -17,10 +18,17 @@ app.use(bodyParser.urlencoded({
 app.use(express.static("public"));
 
 
-mongoose.connect(MONGO_URl, { // mongoDB personal connection
+
+
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
-});
+})
+  .then(() => {
+    console.log('mongo db connected..')
+  }
+
+  );
 
 
 const itemSchema = {
@@ -49,26 +57,26 @@ const defaultItems = [item1, item2, item3];
 
 
 const listSchema = {
-  name:String,
-  items:[itemSchema]
+  name: String,
+  items: [itemSchema]
 }
 
-const List= mongoose.model("List", listSchema);
+const List = mongoose.model("List", listSchema);
 
 
 
 
 
 
-app.get("/", function(req, res) {
+app.get("/", function (req, res) {
 
 
 
-  Item.find({}, function(err, foundItems) {
+  Item.find({}, function (err, foundItems) {
 
     if (foundItems.length === 0) {
 
-      Item.insertMany(defaultItems, function(err) {
+      Item.insertMany(defaultItems, function (err) {
         if (err) {
           console.log(err);
         } else {
@@ -95,27 +103,29 @@ app.get("/", function(req, res) {
 
 });
 
-app.get("/:customListName", function(req,res){
-  const customListName= _.capitalize(req.params.customListName);
+app.get("/:customListName", function (req, res) {
+  const customListName = _.capitalize(req.params.customListName);
 
-  List.findOne({name:customListName}, function(err, foundList){
+  List.findOne({ name: customListName }, function (err, foundList) {
 
-    if(!err){
+    if (!err) {
       if (!foundList) {
 
         // create a new list
         const list = new List({
-          name:customListName,
-          items:defaultItems
+          name: customListName,
+          items: defaultItems
         });
 
         list.save();
         res.redirect("/" + customListName);
-      }else {
+      } else {
         // show an existing list
 
-        res.render("list", {listTitle: foundList.name,
-        newListItems: foundList.items});
+        res.render("list", {
+          listTitle: foundList.name,
+          newListItems: foundList.items
+        });
       }
     }
 
@@ -126,20 +136,20 @@ app.get("/:customListName", function(req,res){
 
 });
 
-app.post("/", function(req, res) {
+app.post("/", function (req, res) {
 
   const itemName = req.body.newItem;
   const listName = req.body.list;
 
   const item = new Item({
-    name:itemName
+    name: itemName
   });
 
   if (listName === "Today") {
     item.save();
     res.redirect("/");
   } else {
-    List.findOne({name:listName}, function(err,foundList){
+    List.findOne({ name: listName }, function (err, foundList) {
 
       foundList.items.push(item);
       foundList.save();
@@ -153,21 +163,21 @@ app.post("/", function(req, res) {
 
 });
 
-app.post("/delete", function(req,res){
+app.post("/delete", function (req, res) {
   const checkedItemId = req.body.checkbox;
   const listName = req.body.listName;
 
   if (listName === "Today") {
 
-    Item.findByIdAndRemove(checkedItemId, function(err){
-      if(!err){
+    Item.findByIdAndRemove(checkedItemId, function (err) {
+      if (!err) {
         console.log("Successfully deleted items");
         res.redirect("/");
       }
     });
 
-  }else {
-    List.findOneAndUpdate({name:listName},{$pull:{items:{_id:checkedItemId}}}, function(err, foundList){
+  } else {
+    List.findOneAndUpdate({ name: listName }, { $pull: { items: { _id: checkedItemId } } }, function (err, foundList) {
 
       if (!err) {
         res.redirect("/" + listName);
@@ -183,7 +193,7 @@ app.post("/delete", function(req,res){
 
 
 
-app.get("/about", function(req, res) {
+app.get("/about", function (req, res) {
   res.render("about");
 });
 
@@ -193,6 +203,6 @@ if (port == null || port == "") {
 }
 
 
-app.listen(port, function() {
+app.listen(port, function () {
   console.log("Server started Successfully");
 });
